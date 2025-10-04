@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Love Letter - Final</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg: #fae3da;
+      --card: #e74c3c;
+      --accent: #ff6fa5;
+      --road: #444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: "Comic Sans MS", "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      overflow-x:hidden;
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding-top:30px;
+    }
+
+    /* Card */
+    .card{
+      width:340px;
+      background:var(--card);
+      color:#fff;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.18);
+      text-align:center;
+      position:relative;
+      z-index:5;
+    }
+    .card h1{margin:0;font-size:22px}
+    .card .logo{margin:8px 0;font-size:18px}
+    .input-name{
+      width:90%;
+      padding:10px;
+      border-radius:10px;
+      border:none;
+      text-align:center;
+      font-size:15px;
+      margin-top:10px;
+    }
+    .btn{
+      display:none;
+      margin-top:14px;
+      background:var(--accent);
+      border:none;
+      padding:10px 22px;
+      border-radius:16px;
+      color:white;
+      font-weight:700;
+      cursor:pointer;
+      transition:transform .14s ease;
+    }
+    .btn:active{transform:scale(.98)}
+
+    /* Falling letters container - created dynamically */
+    .letter{
+      position:fixed;
+      top:-70px;
+      pointer-events:none;
+      z-index:3;
+      transform-origin:center;
+      animation:fall linear forwards;
+      user-select:none;
+    }
+    @keyframes fall{
+      to{transform:translateY(120vh) rotate(720deg); opacity:0}
+    }
+
+    /* Road and bus */
+    .road{
+      position:fixed;
+      left:0; right:0;
+      bottom:0;
+      height:92px;
+      background:var(--road);
+      border-top:5px solid #2b2b2b;
+      z-index:2;
+    }
+    .road::before{
+      content:"";
+      position:absolute;
+      top:36px;
+      left:0;
+      right:0;
+      height:8px;
+      background:repeating-linear-gradient(to right, #fff 0 40px, transparent 40px 80px);
+      opacity:.9;
+    }
+
+    .bus{
+      position:fixed;
+      bottom:18px;
+      left:-220px;
+      font-size:100px;
+      z-index:4;
+       transform: scaleX(-1);
+      animation:drive 8.5s linear infinite;
+      filter:drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+    }
+    @keyframes drive{
+      to{left:110%}
+    }
+
+    /* Envelope */
+    .envelope-wrap{
+      position:fixed;
+      left:50%;
+      top:45%;
+      transform:translate(-50%,-50%);
+      z-index:6;
+      pointer-events:none;
+      width:320px;
+      height:220px;
+      display:none; /* toggled on when user clicks button */
+      align-items:center;
+      justify-content:center;
+    }
+
+    .envelope{
+      width:320px;
+      height:200px;
+      position:relative;
+      transform-style:preserve-3d;
+      perspective:800px;
+      margin:auto;
+    }
+
+    /* back of envelope / base */
+    .env-base{
+      position:absolute;
+      inset:0;
+      background:#ffdfe6;
+      border-radius:12px;
+      border:2px solid #e66;
+      box-shadow:0 12px 30px rgba(0,0,0,0.18);
+      overflow:hidden;
+    }
+
+    /* flap */
+    .env-flap{
+      position:absolute;
+      left:0;
+      right:0;
+      top:-2px;
+      height:0;
+      width:0;
+      margin:auto;
+      border-left:160px solid transparent;
+      border-right:160px solid transparent;
+      border-bottom:110px solid #e74c3c;
+      transform-origin:top;
+      transform:translateZ(1px) rotateX(0deg);
+      transition: transform .9s cubic-bezier(.2,.9,.26,1);
+      z-index:8;
+    }
+
+    /* paper inside */
+    .paper{
+      position:absolute;
+      left:12px;
+      right:12px;
+      top:140px;
+      height:120px;
+      background:white;
+      border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.12);
+      padding:18px;
+      overflow:hidden;
+      transition: top .85s cubic-bezier(.2,.9,.26,1);
+      z-index:6;
+      font-family: Georgia, 'Times New Roman', serif;
+      color:#222;
+      text-align:left;
+      line-height:1.45;
+      font-size:15px;
+    }
+
+    .paper p{margin:0}
+
+    /* when opened */
+    .envelope-wrap.open{display:flex}
+    .envelope-wrap.open .env-flap{
+      transform: translateZ(1px) rotateX(180deg);
+    }
+    .envelope-wrap.open .paper{
+      top:18px;
+    }
+
+    /* small heart icon on envelope front */
+    .env-seal{
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:30px;
+      z-index:7;
+      font-size:20px;
+      color:#e74c3c;
+    }
+
+    /* close button on paper (optional) */
+    .paper .close{
+      position:absolute;
+      right:10px;
+      top:6px;
+      cursor:pointer;
+      font-weight:bold;
+      color:#888;
+      font-size:18px;
+    }
+
+    /* responsive small screens */
+    @media (max-width:420px){
+      .card{width:88%}
+      .envelope{width:90vw;height:55vw}
+      .env-flap{border-left:45vw solid transparent;border-right:45vw solid transparent;border-bottom:30vw solid #e74c3c}
+      .paper{left:6px;right:6px}
+      .bus{font-size:44px}
+    }
+  </style>
+</head>
+<body>
+  <div class="card" aria-hidden="false">
+    <h1> Hallo </h1>
+    <div class="logo">💌 Gửi bạn 💌</div>
+    <input id="nameInput" class="input-name" placeholder=" Họ và tên " />
+    <button id="btnReceive" class="btn">Nhận thư</button>
+  </div>
+
+  <!-- Falling letters will be appended to body by JS -->
+
+  <!-- Road and bus -->
+  <div class="road" aria-hidden="true"></div>
+  <div class="bus" aria-hidden="true">🚌</div>
+
+  <!-- Envelope animation -->
+  <div class="envelope-wrap" id="envelopeWrap" aria-hidden="true">
+    <div class="envelope" role="dialog" aria-label="Envelope">
+      <div class="env-base"></div>
+      <div class="env-flap" id="envFlap"></div>
+      <div class="env-seal">❤️</div>
+      <div class="paper" id="paper">
+        <span class="close" id="closePaper">&times;</span>
+        <p id="letterText">
+          🎁 hehe 🌸
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const input = document.getElementById('nameInput');
+    const btn = document.getElementById('btnReceive');
+    const envelopeWrap = document.getElementById('envelopeWrap');
+    const envFlap = document.getElementById('envFlap');
+    const paper = document.getElementById('paper');
+    const closePaper = document.getElementById('closePaper');
+    const letterText = document.getElementById('letterText');
+
+    // show button when there's input
+    input.addEventListener('input', () => {
+      if(input.value.trim()) btn.style.display = 'inline-block';
+      else btn.style.display = 'none';
+    });
+
+    // create falling letters - many, varied
+    function spawnLetters(count=28, interval=140){
+      for(let i=0;i<count;i++){
+        setTimeout(()=>{
+          const el = document.createElement('div');
+          el.className = 'letter';
+          el.textContent = '✉️';
+          // random horizontal start
+          const start = Math.random()*100;
+          el.style.left = start + 'vw';
+          // random size
+          const size = 18 + Math.random()*36;
+          el.style.fontSize = size + 'px';
+          // random fall duration and delay
+          const dur = 4 + Math.random()*5;
+          el.style.animationDuration = dur + 's';
+          el.style.opacity = 0.95;
+          // slight horizontal sway using transform during creation (random rotate start)
+          el.style.transform = 'rotate(' + (Math.random()*60-30) + 'deg)';
+          document.body.appendChild(el);
+          // remove after done
+          setTimeout(()=>{ el.remove(); }, (dur+0.6)*1000);
+        }, i * interval);
+      }
+    }
+
+    // Open envelope sequence
+    function showEnvelope(){
+      // show envelope container
+      envelopeWrap.classList.add('open');
+      envelopeWrap.style.pointerEvents = 'auto';
+
+      // play small bounce on paper to simulate being pulled
+      paper.style.transition = 'top .6s cubic-bezier(.2,.9,.26,1)';
+      setTimeout(()=>{
+        paper.style.transform = 'translateY(-8px)';
+      }, 600);
+      setTimeout(()=>{
+        paper.style.transform = 'translateY(0)';
+      }, 1100);
+    }
+
+    // Close envelope
+    function closeEnvelope(){
+      envelopeWrap.classList.remove('open');
+      envelopeWrap.style.pointerEvents = 'none';
+    }
+
+    // Button click
+    btn.addEventListener('click', ()=>{
+      // spawn lots of letters
+      spawnLetters(36, 120);
+
+      // slight delay then show envelope
+      setTimeout(()=>{
+        showEnvelope();
+      }, 1000);
+
+      // Optionally auto-close after some time
+      // setTimeout(closeEnvelope, 8000);
+    });
+
+    // Close click
+    closePaper.addEventListener('click', ()=>{
+      closeEnvelope();
+    });
+
+    // allow clicking outside to close
+    envelopeWrap.addEventListener('click', (e)=>{
+      if(e.target === envelopeWrap) closeEnvelope();
+    });
+
+    // Prevent tab focus outlines from breaking visual - small accessibility nicety
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape') closeEnvelope();
+    });
+  </script>
+</body>
+</html>
