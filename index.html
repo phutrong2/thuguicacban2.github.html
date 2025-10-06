@@ -49,18 +49,24 @@
       margin-top:10px;
     }
     .btn{
-      display:none;
-      margin-top:14px;
-      background:var(--accent);
-      border:none;
-      padding:10px 22px;
-      border-radius:16px;
-      color:white;
-      font-weight:700;
-      cursor:pointer;
-      transition:transform .14s ease;
-    }
-    .btn:active{transform:scale(.98)}
+     display: none;
+  background: linear-gradient(45deg, #ff8fa3, #ff5b84);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 91, 132, 0.5);
+  animation: heartbeat 2s infinite;
+  transition: 0.3s;
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.btn:hover { background: linear-gradient(45deg, #ff6b8f, #ff477d); }
 
     /* Falling letters container - created dynamically */
     .letter{
@@ -101,7 +107,7 @@
       position:fixed;
       bottom:18px;
       left:-220px;
-      font-size:100px;
+      font-size:180px;
       z-index:4;
        transform: scaleX(-1);
       animation:drive 8.5s linear infinite;
@@ -253,7 +259,7 @@
       <div class="paper" id="paper">
         <span class="close" id="closePaper">&times;</span>
         <p id="letterText">
-          🎁 hehe 🌸
+          🎁 Mời bạn tới sinh nhật tui tại Pizza 4P's Vincom Grand Park vào ngày 13/10/2025 nhé  🌸
         </p>
       </div>
     </div>
@@ -327,8 +333,16 @@
     btn.addEventListener('click', ()=>{
       // spawn lots of letters
       spawnLetters(36, 120);
+      // lấy tên người nhập
+  const name = input.value.trim();
 
-      // slight delay then show envelope
+  // nếu có tên, chèn vào thư
+  if(name){
+    letterText.textContent = `🎁 Mời ${name} tới sinh nhật tui tại Pizza 4P's Vincom Grand Park vào ngày 13/10/2025 nhé 🌸`;
+  } else {
+    letterText.textContent = `🎁 Mời bạn tới sinh nhật tui tại Pizza 4P's Vincom Grand Park vào ngày 13/10/2025 nhé 🌸`;
+  }
+ // slight delay then show envelope
       setTimeout(()=>{
         showEnvelope();
       }, 1000);
@@ -354,4 +368,3 @@
   </script>
 </body>
 </html>
-
